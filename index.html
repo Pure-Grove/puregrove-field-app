@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PureGrove">
+<title>PureGrove Field App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --cream: #FCFCF7; --paper: #FAF8F2; --green: #1C3A13; --forest: #2D5A1E;
+  --light: #E4F0E4; --near-black: #171714; --ink2: #5A5A56; --ink3: #8A8A84;
+  --gold: #C9A96E; --gold-soft: #D9BE89; --rule: rgba(28,58,19,0.10);
+  --amber-bg: #FFF8EC; --amber-border: rgba(201,169,110,0.4); --amber-text: #7A5C2E;
+  --radius: 12px; --radius-sm: 8px;
+}
+
+html, body { height: 100%; overflow: hidden; background: var(--cream); }
+
+body {
+  font-family: 'Poppins', -apple-system, sans-serif;
+  color: var(--near-black);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Layout ── */
+#app { display: flex; flex-direction: column; height: 100vh; height: -webkit-fill-available; background: var(--cream); }
+.band { background: var(--green); padding: 16px 20px 14px; flex-shrink: 0; }
+.band-row { display: flex; justify-content: space-between; align-items: flex-start; }
+.mark-name { font-family: 'Playfair Display', Georgia, serif; font-weight: 500; font-size: 22px; letter-spacing: -0.01em; color: var(--cream); }
+.mark-tag { font-size: 8px; font-weight: 600; letter-spacing: 2.4px; text-transform: uppercase; color: var(--gold-soft); margin-top: 4px; }
+.band-right { text-align: right; }
+.band-screen-label { font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-soft); }
+.band-subtitle { font-size: 11px; color: rgba(252,252,247,0.55); margin-top: 2px; }
+
+.scroll-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; background: var(--cream); }
+.bottom-nav { flex-shrink: 0; background: var(--cream); border-top: 1px solid var(--rule); padding: 12px 16px; padding-bottom: max(12px, env(safe-area-inset-bottom)); display: flex; gap: 10px; }
+
+/* ── Screens ── */
+.screen { display: none; }
+.screen.active { display: flex; flex-direction: column; height: 100%; }
+
+/* ── Eyebrow ── */
+.eyebrow { display: flex; align-items: center; gap: 9px; font-size: 9px; font-weight: 600; letter-spacing: 2.4px; text-transform: uppercase; color: var(--gold); }
+.eyebrow::before { content: ""; width: 16px; height: 1px; background: var(--gold); flex-shrink: 0; }
+
+/* ── Buttons ── */
+.btn-primary { flex: 1; background: var(--green); color: var(--cream); border: none; border-radius: var(--radius); padding: 15px; font-size: 14px; font-weight: 600; letter-spacing: 0.4px; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-primary:active { background: var(--forest); }
+.btn-secondary { background: transparent; color: var(--ink2); border: 1.5px solid var(--rule); border-radius: var(--radius); padding: 15px 18px; font-size: 14px; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-secondary:active { background: var(--paper); }
+.btn-ghost { background: none; border: none; cursor: pointer; font-family: inherit; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ HOME ━━ */
+.home-body { padding: 20px 16px 16px; }
+.home-section-label { font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--ink3); margin-bottom: 10px; }
+
+.tier-card { background: var(--cream); border: 1.5px solid var(--rule); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 14px; }
+.tier-card:active { background: var(--paper); }
+.tier-card-text { flex: 1; }
+.tier-eyebrow { font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 3px; }
+.tier-name { font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 500; letter-spacing: -0.02em; color: var(--near-black); }
+.tier-name em { font-style: italic; color: var(--forest); }
+.tier-desc { font-size: 11.5px; color: var(--ink2); margin-top: 3px; line-height: 1.4; }
+.tier-arrow { color: var(--ink3); font-size: 20px; }
+
+.divider { height: 1px; background: var(--rule); margin: 20px 0; }
+
+/* History preview */
+.history-row { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--cream); border: 1.5px solid var(--rule); border-radius: var(--radius); margin-bottom: 8px; cursor: pointer; }
+.history-row:active { background: var(--paper); }
+.history-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.history-dot.fresh { background: #639922; }
+.history-dot.revived { background: var(--forest); }
+.history-dot.renewed { background: var(--green); }
+.history-info { flex: 1; min-width: 0; }
+.history-customer { font-size: 13px; font-weight: 500; color: var(--near-black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.history-meta { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+.history-score { font-size: 11px; font-weight: 600; color: var(--green); }
+.view-all-btn { font-size: 12px; font-weight: 600; color: var(--gold); text-align: center; padding: 10px; cursor: pointer; letter-spacing: 0.3px; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ JOB FLOW ━━ */
+.job-header { padding: 14px 16px 12px; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
+.back-btn { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
+.job-display-title { font-family: 'Playfair Display', Georgia, serif; font-size: 28px; font-weight: 500; letter-spacing: -0.025em; color: var(--near-black); line-height: 1.05; margin-top: 6px; }
+.job-display-title em { font-style: italic; color: var(--forest); }
+
+.progress-wrap { padding: 10px 16px 0; flex-shrink: 0; }
+.progress-track { height: 3px; background: var(--rule); border-radius: 2px; }
+.progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.3s ease; }
+.progress-lbl { font-size: 10px; color: var(--ink3); margin-top: 5px; }
+
+.phase-content { padding: 16px; }
+.phase-badge { display: inline-block; font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; background: var(--light); color: var(--green); padding: 5px 10px; border-radius: 6px; margin-bottom: 14px; }
+
+/* Step cards */
+.step-card { background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; margin-bottom: 10px; }
+.step-card.gold-left { border-left: 3px solid var(--gold); border-radius: 0 10px 10px 0; }
+.step-inner { padding: 13px 14px; display: flex; gap: 11px; }
+.step-num { font-size: 10px; font-weight: 600; color: var(--ink3); min-width: 24px; flex-shrink: 0; padding-top: 1px; }
+.step-body { flex: 1; }
+.step-text { font-size: 13px; line-height: 1.6; color: var(--near-black); }
+.step-text strong { font-weight: 600; }
+.gold-badge { display: inline-block; background: var(--gold); color: #3A2700; font-size: 8px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+
+.mix-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.mix-pill { display: inline-flex; align-items: center; gap: 5px; background: var(--light); border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 500; color: var(--green); }
+.mix-pill::before { content: "⊕"; font-size: 11px; }
+
+.warn-box, .dwell-box { display: flex; gap: 8px; background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: 8px; padding: 10px 12px; margin-top: 8px; font-size: 12px; color: var(--amber-text); line-height: 1.5; }
+.warn-box::before { content: "⚠"; flex-shrink: 0; }
+.dwell-box::before { content: "⏱"; flex-shrink: 0; }
+
+/* Fields */
+.field-block { margin-bottom: 12px; }
+.field-lbl { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink3); display: block; margin-bottom: 6px; }
+.field-input { width: 100%; background: var(--paper); border: 1.5px solid var(--rule); border-radius: var(--radius-sm); padding: 11px 13px; font-size: 14px; color: var(--near-black); font-family: inherit; resize: none; -webkit-appearance: none; }
+.field-input:focus { outline: none; border-color: var(--forest); }
+.photo-note-box { background: var(--light); border-radius: var(--radius-sm); padding: 10px 13px; margin-bottom: 10px; font-size: 12px; color: var(--green); line-height: 1.5; }
+
+.atp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.atp-cell { background: var(--light); border-radius: var(--radius-sm); padding: 10px 12px; }
+.atp-cell-lbl { font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--green); display: block; margin-bottom: 7px; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ CHECKLIST ━━ */
+.cl-section { padding: 16px 16px 0; }
+.cl-title { font-family: 'Playfair Display', Georgia, serif; font-size: 22px; font-weight: 500; color: var(--near-black); margin-bottom: 4px; }
+.cl-subtitle { font-size: 12px; color: var(--ink2); margin-bottom: 14px; line-height: 1.4; }
+.cl-score { font-size: 11px; font-weight: 600; color: var(--green); margin-bottom: 14px; }
+
+.cl-group { margin-bottom: 8px; border-radius: var(--radius); overflow: hidden; border: 1.5px solid var(--rule); }
+.cl-group-lbl { background: var(--green); color: var(--gold-soft); font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 7px 14px; }
+.cl-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; background: var(--cream); border-top: 1px solid var(--rule); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.cl-item:active { background: var(--paper); }
+.cl-item.premium { border-left: 3px solid var(--gold); }
+.cl-box { width: 24px; height: 24px; border: 1.5px solid rgba(28,58,19,0.3); border-radius: 5px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; background: var(--cream); margin-top: 1px; }
+.cl-box.checked { background: var(--green); border-color: var(--green); }
+.cl-checkmark { width: 13px; height: 7px; border-left: 2.5px solid var(--cream); border-bottom: 2.5px solid var(--cream); transform: rotate(-45deg) translateY(-2px); display: none; }
+.cl-box.checked .cl-checkmark { display: block; }
+.cl-text { font-size: 13px; color: var(--near-black); line-height: 1.45; flex: 1; }
+.cl-text.done { text-decoration: line-through; color: var(--ink3); }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ COMPLETE ━━ */
+.complete-body { padding: 24px 16px; text-align: center; }
+.complete-icon { width: 60px; height: 60px; background: var(--light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 28px; }
+.complete-title { font-family: 'Playfair Display', Georgia, serif; font-size: 28px; font-weight: 500; color: var(--near-black); margin-bottom: 6px; }
+.complete-title em { font-style: italic; color: var(--forest); }
+.complete-sub { font-size: 13px; color: var(--ink2); line-height: 1.5; margin-bottom: 20px; }
+.summary-card { background: var(--paper); border: 1.5px solid var(--rule); border-radius: var(--radius); padding: 14px 16px; text-align: left; margin-bottom: 12px; }
+.summary-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid var(--rule); font-size: 13px; gap: 12px; }
+.summary-row:last-child { border-bottom: none; }
+.summary-key { color: var(--ink2); flex-shrink: 0; }
+.summary-val { font-weight: 500; color: var(--near-black); text-align: right; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ HISTORY ━━ */
+.history-full { padding: 16px; }
+.history-full-item { background: var(--cream); border: 1.5px solid var(--rule); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; cursor: pointer; }
+.history-full-item:active { background: var(--paper); }
+.history-item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.history-item-customer { font-size: 15px; font-weight: 500; color: var(--near-black); }
+.history-item-tier { font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; }
+.tier-pill-fresh { background: #EAF3DE; color: #3B6D11; }
+.tier-pill-revived { background: var(--light); color: var(--forest); }
+.tier-pill-renewed { background: var(--green); color: var(--gold-soft); }
+.history-item-meta { font-size: 12px; color: var(--ink3); margin-top: 5px; display: flex; gap: 14px; flex-wrap: wrap; }
+.history-item-notes { font-size: 12px; color: var(--ink2); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule); line-height: 1.5; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ JOB DETAIL ━━ */
+.detail-section { padding: 16px; }
+.detail-section-label { font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--ink3); margin: 14px 0 8px; }
+.detail-field-row { padding: 10px 0; border-bottom: 1px solid var(--rule); display: flex; gap: 10px; }
+.detail-field-row:last-child { border-bottom: none; }
+.detail-key { font-size: 12px; color: var(--ink2); flex-shrink: 0; width: 120px; }
+.detail-val { font-size: 13px; color: var(--near-black); font-weight: 500; flex: 1; }
+.detail-cl-item { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--rule); align-items: flex-start; }
+.detail-cl-item:last-child { border-bottom: none; }
+.detail-check { width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+.detail-check.yes { background: var(--green); color: var(--cream); }
+.detail-check.no { background: var(--paper); border: 1.5px solid rgba(28,58,19,0.2); color: var(--ink3); }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--ink3); }
+.empty-state p { font-size: 13px; line-height: 1.6; }
+
+@media (min-width: 600px) {
+  #app { max-width: 560px; margin: 0 auto; box-shadow: 0 0 40px rgba(0,0,0,0.08); }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ════════════ HOME ════════════ -->
+  <div id="s-home" class="screen active">
+    <div class="band">
+      <div class="band-row">
+        <div><div class="mark-name">PureGrove</div><div class="mark-tag">Clean Turf, Done Right</div></div>
+        <div class="band-right"><div class="band-screen-label">Field App</div></div>
+      </div>
+    </div>
+    <div class="scroll-body">
+      <div class="home-body">
+        <div class="home-section-label">Start a job</div>
+        <div class="tier-card" onclick="startJob('fresh')">
+          <div class="tier-card-text">
+            <div class="tier-eyebrow">Tier One</div>
+            <div class="tier-name">Fresh <em>Grove</em></div>
+            <div class="tier-desc">Surface maintenance</div>
+          </div>
+          <div class="tier-arrow">›</div>
+        </div>
+        <div class="tier-card" onclick="startJob('revived')">
+          <div class="tier-card-text">
+            <div class="tier-eyebrow">Tier Two</div>
+            <div class="tier-name">Revived <em>Grove</em></div>
+            <div class="tier-desc">Deep odor elimination</div>
+          </div>
+          <div class="tier-arrow">›</div>
+        </div>
+        <div class="tier-card" onclick="startJob('renewed')">
+          <div class="tier-card-text">
+            <div class="tier-eyebrow">Tier Three</div>
+            <div class="tier-name">Renewed <em>Grove</em></div>
+            <div class="tier-desc">Restoration + premium protection</div>
+          </div>
+          <div class="tier-arrow">›</div>
+        </div>
+
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div class="home-section-label" style="margin-bottom:0;">Recent jobs</div>
+          <div class="btn-ghost view-all-btn" style="padding:0;font-size:11px;" onclick="showHistory()">View all ›</div>
+        </div>
+        <div id="home-history"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ JOB FLOW ════════════ -->
+  <div id="s-job" class="screen">
+    <div class="band">
+      <div class="band-row">
+        <div><div class="mark-name">PureGrove</div><div class="mark-tag">Clean Turf, Done Right</div></div>
+        <div class="band-right"><div class="band-screen-label" id="job-phase-label">Pre-Job</div></div>
+      </div>
+    </div>
+    <div class="job-header">
+      <button class="back-btn" onclick="confirmBack()">‹ Back</button>
+      <div class="eyebrow" id="job-eyebrow"></div>
+      <div class="job-display-title" id="job-display-title"></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-lbl" id="progress-lbl"></div>
+    </div>
+    <div class="scroll-body" id="job-scroll">
+      <div id="job-content"></div>
+    </div>
+    <div class="bottom-nav">
+      <button class="btn-secondary" id="btn-prev" onclick="prevPhase()" style="display:none;">‹</button>
+      <button class="btn-primary" id="btn-next" onclick="nextPhase()">Next ›</button>
+    </div>
+  </div>
+
+  <!-- ════════════ COMPLETE ════════════ -->
+  <div id="s-complete" class="screen">
+    <div class="band">
+      <div class="band-row">
+        <div><div class="mark-name">PureGrove</div><div class="mark-tag">Clean Turf, Done Right</div></div>
+        <div class="band-right"><div class="band-screen-label">Job Complete</div></div>
+      </div>
+    </div>
+    <div class="scroll-body">
+      <div class="complete-body">
+        <div class="complete-icon">✓</div>
+        <div class="complete-title">Job <em>complete.</em></div>
+        <div class="complete-sub">All steps done. Upload photos to the job record and load out.</div>
+        <div class="summary-card" id="complete-summary"></div>
+        <button class="btn-primary" onclick="goHome()" style="width:100%;margin-top:4px;">New Job</button>
+        <div style="height:8px;"></div>
+        <button class="btn-secondary" onclick="showHistory()" style="width:100%;">View Job History</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ HISTORY LIST ════════════ -->
+  <div id="s-history" class="screen">
+    <div class="band">
+      <div class="band-row">
+        <div><div class="mark-name">PureGrove</div><div class="mark-tag">Clean Turf, Done Right</div></div>
+        <div class="band-right"><div class="band-screen-label">Job History</div></div>
+      </div>
+    </div>
+    <div class="job-header" style="padding-bottom:0;">
+      <button class="back-btn" onclick="goHome()">‹ Home</button>
+      <div class="eyebrow" style="margin-bottom:0;">All Jobs</div>
+    </div>
+    <div class="scroll-body">
+      <div class="history-full" id="history-list"></div>
+    </div>
+  </div>
+
+  <!-- ════════════ JOB DETAIL ════════════ -->
+  <div id="s-detail" class="screen">
+    <div class="band">
+      <div class="band-row">
+        <div><div class="mark-name">PureGrove</div><div class="mark-tag">Clean Turf, Done Right</div></div>
+        <div class="band-right"><div class="band-screen-label">Job Record</div></div>
+      </div>
+    </div>
+    <div class="job-header" style="padding-bottom:0;">
+      <button class="back-btn" id="detail-back-btn" onclick="showHistory()">‹ History</button>
+      <div class="eyebrow" id="detail-eyebrow"></div>
+      <div class="job-display-title" id="detail-title"></div>
+    </div>
+    <div class="scroll-body">
+      <div class="detail-section" id="detail-content"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ DATA ━━
+const TIERS = {
+  fresh: {
+    name: 'Fresh Grove', eyebrow: 'Tier One — Surface Maintenance',
+    title: 'Fresh <em>Grove,</em><br>done right.',
+    phases: [
+      { label: 'Pre-Job', steps: [
+        { n:'1.1', t:'<strong>Mix Simple Green before any work begins.</strong>', mixes:['4 oz Simple Green per 1 gallon water'] },
+        { n:'1.2', t:'<strong>Take all before photos before touching the turf.</strong> Walk the full area and photograph from consistent positions.', warn:'Write photo positions here — after shots must match exactly.' },
+        { field:'photo_positions', label:'Photo positions (e.g. "at gate facing south")', type:'textarea', rows:3 }
+      ]},
+      { label: 'Job', steps: [
+        { n:'2.1', t:'Walk full turf. <strong>Remove all visible solid pet waste</strong> with the pooper scooper and PureGrove bags.' },
+        { n:'2.2', t:'Bag waste and <strong>set aside at job entry point</strong> for removal at end of job.' },
+        { n:'3.1', t:'<strong>Power broom entire surface in slow, overlapping passes.</strong> The broom lifts fibers and sweeps debris — take your time. Do not rush.' },
+        { n:'3.2', t:'<strong>Work in one direction</strong>, consolidating all debris into a single collection pile.', warn:'Never direct the power broom toward pools, pool decks, or patios.' },
+        { n:'3.3', t:'Extra passes on <strong>matted and high-traffic areas</strong> until fibers are fully upright.' },
+        { n:'4.1', t:'<strong>Vacuum up the debris pile.</strong>' },
+        { n:'4.2', t:'<strong>Vacuum all edges and cracks.</strong>' },
+        { n:'5.1', t:'Backpack blower along <strong>all edges, cracks, and border joints.</strong> Direct debris back onto turf for pickup.', warn:'Never blow toward pools, patios, or neighboring property.' },
+        { n:'6.1', t:'<strong>Hand-remove all visible perimeter weeds.</strong> Bag for removal at end of job.', warn:'Manual removal is included. Chemical treatment is an add-on — only if authorized on job order.' },
+        { n:'7.1', t:'<strong>Apply Simple Green</strong> evenly across the full surface in consistent rows. Do not skip any area.' },
+        { n:'7.2', t:'Allow to <strong>air dry naturally.</strong> Do not rinse.' },
+        { n:'8.1', t:'<strong>Light final broom pass or blow</strong> to restore fiber direction if needed. Turf must look clean and finished.' }
+      ]},
+      { label: 'Post-Job', steps: [
+        { n:'9.1', t:'<strong>Take after photos from the exact same positions</strong> noted in pre-job. Turf must be in finished condition.' },
+        { n:'9.2', t:'<strong>Empty and clean all equipment</strong> (vacuum canister, pump sprayer, pooper scooper) before loading out.' },
+        { n:'9.3', t:'<strong>Remove all waste bags and debris from the property.</strong>' },
+        { n:'9.4', t:'<strong>Upload all before/after photos</strong> to the job record.' }
+      ], fields: [
+        { field:'customer_name', label:'Customer name', type:'text' },
+        { field:'job_id', label:'Job ID', type:'text' },
+        { field:'sqft', label:'Square footage', type:'text' },
+        { field:'notes', label:'Field notes', type:'textarea', rows:3 }
+      ]}
+    ],
+    checklist: {
+      'Pre-Job': [
+        { t:'Simple Green mixed (4 oz / 1 gal)', p:false },
+        { t:'Before photos taken — positions recorded', p:false }
+      ],
+      'Job': [
+        { t:'Pet waste removed — set aside for removal', p:false },
+        { t:'Full turf power broomed — debris in single pile', p:false },
+        { t:'No debris toward pool / patio / neighbor', p:false },
+        { t:'Debris pile + edges/cracks vacuumed', p:false },
+        { t:'Backpack blower run — edges + perimeter', p:false },
+        { t:'Perimeter weeds removed (chemical add-on confirmed if applicable)', p:false },
+        { t:'Simple Green applied — full surface, air dry, no rinse', p:false },
+        { t:'Light final groom complete', p:false }
+      ],
+      'Post-Job': [
+        { t:'After photos taken — matching positions, turf finished', p:false },
+        { t:'All equipment emptied and cleaned', p:false },
+        { t:'Waste bags + debris removed from property', p:false },
+        { t:'Photos uploaded to job record', p:false }
+      ]
+    }
+  },
+
+  revived: {
+    name: 'Revived Grove', eyebrow: 'Tier Two — Deep Odor Elimination',
+    title: 'Revived <em>Grove,</em><br>done right.',
+    phases: [
+      { label: 'Pre-Job', steps: [
+        { n:'1.1', t:'<strong>Mix all products before any work begins.</strong>', mixes:['OxyTurf Enzyme — 16 oz per 1 gallon water','OxiTabs Sanitizer — 1 tablet per 1 gallon water','Vital Oxide — 2 oz per 1 gal (if using instead of OxiTabs)'] },
+        { n:'1.2', t:'<strong>Take all before photos before touching the turf.</strong> Walk full area, photograph from consistent positions.', warn:'Write photo positions here — after shots must match exactly.' },
+        { field:'photo_positions', label:'Photo positions', type:'textarea', rows:3 }
+      ]},
+      { label: 'Job', steps: [
+        { n:'2.1', t:'Walk full turf. <strong>Remove all visible solid pet waste</strong> with the pooper scooper and PureGrove bags.' },
+        { n:'2.2', t:'Bag waste and <strong>set aside at job entry point</strong> for removal at end of job.' },
+        { n:'3.1', t:'<strong>Power broom entire surface in slow, overlapping passes.</strong> The broom lifts fibers and sweeps debris — take your time. Do not rush.' },
+        { n:'3.2', t:'<strong>Work in one direction</strong>, consolidating all debris into a single pile.', warn:'Never direct the power broom toward pools, pool decks, or patios.' },
+        { n:'3.3', t:'Extra passes on <strong>matted and high-traffic areas</strong> until fibers are fully upright.' },
+        { n:'4.1', t:'<strong>Vacuum up the debris pile.</strong>' },
+        { n:'4.2', t:'<strong>Vacuum all edges and cracks.</strong>' },
+        { n:'5.1', t:'Backpack blower along <strong>all edges, cracks, and border joints.</strong> Direct debris back onto turf.', warn:'Never blow toward pools, patios, or neighboring property.' },
+        { n:'6.1', t:'<strong>Hand-remove all visible perimeter weeds.</strong> Bag for removal.', warn:'Manual removal is included. Chemical treatment is an add-on — only if authorized on job order.' },
+        { n:'7.1', t:'<strong>Apply OxyTurf</strong> evenly across the full surface. <strong>Saturate fully — do not flood.</strong>' },
+        { n:'7.2', t:'<strong>Allow 10–15 minutes dwell time.</strong> Set a timer. Do not proceed early.', dwell:'10–15 min dwell required — set a timer now.' },
+        { n:'7.3', t:'After dwell: <strong>light agitation with a blow or brush pass</strong> to work the enzyme into the infill.' },
+        { n:'8.1', t:'<strong>Apply OxiTabs or Vital Oxide</strong> evenly across the full surface in consistent rows.' },
+        { n:'8.2', t:'Allow to <strong>air dry naturally.</strong> Do not rinse.' },
+        { n:'9.1', t:'<strong>Inspect infill levels</strong> across the full surface. Add fresh infill to low or depleted areas. Note significant depletion in field notes.' },
+        { n:'10.1', t:'<strong>Final broom pass or blow</strong> to restore fiber direction and leave turf in finished condition.' }
+      ]},
+      { label: 'Post-Job', steps: [
+        { n:'11.1', t:'<strong>Take after photos from the exact same positions</strong> noted in pre-job.' },
+        { n:'11.2', t:'<strong>Empty and clean all equipment</strong> (vacuum, sprayers, pooper scooper) before loading out.' },
+        { n:'11.3', t:'<strong>Remove all waste bags and debris from the property.</strong>' },
+        { n:'11.4', t:'<strong>Upload all before/after photos</strong> to the job record.' }
+      ], fields: [
+        { field:'customer_name', label:'Customer name', type:'text' },
+        { field:'job_id', label:'Job ID', type:'text' },
+        { field:'sqft', label:'Square footage', type:'text' },
+        { field:'infill_notes', label:'Infill depletion notes (if any)', type:'textarea', rows:2 },
+        { field:'notes', label:'Field notes', type:'textarea', rows:3 }
+      ]}
+    ],
+    checklist: {
+      'Pre-Job': [
+        { t:'OxyTurf mixed (16 oz / 1 gal)', p:false },
+        { t:'OxiTabs (1 tab / 1 gal) or Vital Oxide (2 oz / 1 gal) mixed', p:false },
+        { t:'Before photos taken — positions recorded', p:false }
+      ],
+      'Job': [
+        { t:'Pet waste removed — set aside for removal', p:false },
+        { t:'Full turf power broomed — debris in single pile', p:false },
+        { t:'No debris toward pool / patio / neighbor', p:false },
+        { t:'Debris pile + edges/cracks vacuumed', p:false },
+        { t:'Backpack blower run — edges + perimeter', p:false },
+        { t:'Perimeter weeds removed (chemical add-on confirmed if applicable)', p:false },
+        { t:'OxyTurf applied — full saturation, 10–15 min dwell observed', p:false },
+        { t:'Light agitation performed after dwell', p:false },
+        { t:'OxiTabs or Vital Oxide applied — air dry, no rinse', p:false },
+        { t:'Infill inspected — fresh infill added where needed', p:false },
+        { t:'Final groom complete', p:false }
+      ],
+      'Post-Job': [
+        { t:'After photos taken — matching positions, turf finished', p:false },
+        { t:'All equipment emptied and cleaned', p:false },
+        { t:'Waste bags + debris removed from property', p:false },
+        { t:'Photos uploaded to job record', p:false }
+      ]
+    }
+  },
+
+  renewed: {
+    name: 'Renewed Grove', eyebrow: 'Tier Three — Restoration + Premium Protection',
+    title: 'Renewed <em>Grove,</em><br>done right.',
+    phases: [
+      { label: 'Pre-Job', steps: [
+        { n:'1.1', t:'<strong>Mix all products before any work begins.</strong>', mixes:['OxyTurf Enzyme — 16 oz per 1 gallon water','OxiTabs Sanitizer — 1 tablet per 1 gallon water','Vital Oxide — 2 oz per 1 gal (if using instead of OxiTabs)','303 UV Protectant — undiluted, do not mix','NonScents Odor Barrier — undiluted, do not mix'] },
+        { n:'1.2', t:'<strong>Conduct ATP baseline test before any work begins.</strong> Test 1–2 zones (high-use area + perimeter). Record below — these are your "before" readings.', premium:true },
+        { field:'atp_baseline', label:'ATP Baseline', type:'atp', prefix:'baseline' },
+        { n:'1.3', t:'<strong>Take all before photos before touching the turf.</strong> Walk full area, photograph from consistent positions.', warn:'Write photo positions here — after shots must match exactly.' },
+        { field:'photo_positions', label:'Photo positions', type:'textarea', rows:2 }
+      ]},
+      { label: 'Job', steps: [
+        { n:'2.1', t:'Walk full turf. <strong>Remove all visible solid pet waste</strong> with the pooper scooper and PureGrove bags.' },
+        { n:'2.2', t:'Bag waste and <strong>set aside at job entry point</strong> for removal at end of job.' },
+        { n:'3.1', t:'<strong>Deep power broom entire surface in slow, overlapping passes.</strong> This tier requires thorough coverage with multiple passes on all zones. Do not rush.' },
+        { n:'3.2', t:'<strong>Work in one direction</strong>, consolidating all debris into a single pile.', warn:'Never direct the power broom toward pools, pool decks, or patios.' },
+        { n:'3.3', t:'Multiple extra passes on <strong>severely matted or compacted areas</strong> until fibers are fully upright.' },
+        { n:'4.1', t:'<strong>Vacuum up the debris pile.</strong>' },
+        { n:'4.2', t:'<strong>Vacuum all edges and cracks.</strong>' },
+        { n:'5.1', t:'Backpack blower along <strong>all edges, cracks, and border joints.</strong> Direct debris back onto turf.', warn:'Never blow toward pools, patios, or neighboring property.' },
+        { n:'6.1', t:'<strong>Hand-remove all visible perimeter weeds.</strong> Bag for removal.', warn:'Manual removal is included. Chemical treatment is an add-on — only if authorized on job order.' },
+        { n:'7.1', t:'<strong>Apply OxyTurf</strong> evenly across full surface. <strong>Saturate fully — do not flood.</strong>' },
+        { n:'7.2', t:'<strong>Allow 10–15 minutes dwell time.</strong> Set a timer. Do not proceed early.', dwell:'10–15 min dwell required — set a timer now.' },
+        { n:'7.3', t:'After dwell: <strong>deep agitation with a blow or brush pass</strong> to work enzyme fully into the infill.' },
+        { n:'8.1', t:'<strong>Pressure washer rinse — full surface.</strong> Consistent overlapping passes. Do not concentrate stream in one spot.', premium:true },
+        { n:'8.2', t:'Allow surface to <strong>drain and reach near-dry condition</strong> before applying next products.', premium:true },
+        { n:'9.1', t:'<strong>Apply OxiTabs or Vital Oxide</strong> evenly across full surface in consistent rows.' },
+        { n:'9.2', t:'Allow to <strong>air dry naturally.</strong> Do not rinse.' },
+        { n:'10.1', t:'<strong>Inspect infill levels.</strong> Add fresh infill to all depleted areas. Note significant losses for the health report.' },
+        { n:'11.1', t:'<strong>Apply 303 UV Protectant undiluted</strong> — light, even mist across full surface. Allow to absorb before applying NonScents.', premium:true },
+        { n:'12.1', t:'<strong>Apply NonScents undiluted</strong> — light, even mist across full surface.', premium:true },
+        { n:'13.1', t:'<strong>Final broom pass or blow</strong> to restore fiber direction. Turf must be in finished condition.' }
+      ]},
+      { label: 'Post-Job', steps: [
+        { n:'14.1', t:'<strong>Conduct ATP post-job test</strong> in the same zones as baseline. Record below.', premium:true },
+        { field:'atp_final', label:'ATP Final Results', type:'atp', prefix:'final' },
+        { n:'14.2', t:'<strong>Take after photos from the exact same positions</strong> noted in pre-job.' },
+        { n:'14.3', t:'<strong>Empty and clean all equipment</strong> (vacuum, sprayers, pressure washer, pooper scooper) before loading out.' },
+        { n:'14.4', t:'<strong>Remove all waste bags and debris from the property.</strong>' },
+        { n:'14.5', t:'<strong>Complete the Annual Health Report</strong> including: infill condition, fiber condition, drainage, ATP results, all products applied.', premium:true },
+        { n:'14.6', t:'<strong>Upload all photos, ATP results, and Health Report</strong> to the job record.' }
+      ], fields: [
+        { field:'customer_name', label:'Customer name', type:'text' },
+        { field:'job_id', label:'Job ID', type:'text' },
+        { field:'sqft', label:'Square footage', type:'text' },
+        { field:'health_notes', label:'Annual Health Report observations', type:'textarea', rows:4 },
+        { field:'notes', label:'Additional field notes', type:'textarea', rows:2 }
+      ]}
+    ],
+    checklist: {
+      'Pre-Job': [
+        { t:'All products mixed at correct ratios', p:false },
+        { t:'ATP baseline test complete — 1–2 zones recorded', p:true },
+        { t:'Before photos taken — positions recorded', p:false }
+      ],
+      'Job': [
+        { t:'Pet waste removed — set aside for removal', p:false },
+        { t:'Full turf deep power broomed — debris in single pile', p:false },
+        { t:'No debris toward pool / patio / neighbor', p:false },
+        { t:'Debris pile + edges/cracks vacuumed', p:false },
+        { t:'Backpack blower run — edges + perimeter', p:false },
+        { t:'Perimeter weeds removed (chemical add-on confirmed if applicable)', p:false },
+        { t:'OxyTurf applied — full saturation, 10–15 min dwell observed', p:false },
+        { t:'Deep agitation performed after dwell', p:false },
+        { t:'Pressure washer rinse — surface drained before next product', p:true },
+        { t:'OxiTabs or Vital Oxide applied — air dry, no rinse', p:false },
+        { t:'Infill inspected — fresh infill added where needed', p:false },
+        { t:'303 UV Protectant — light, even, undiluted', p:true },
+        { t:'NonScents odor barrier — light, even, undiluted', p:true },
+        { t:'Final groom complete', p:false }
+      ],
+      'Post-Job': [
+        { t:'ATP post-job test complete — same zones as baseline', p:true },
+        { t:'After photos taken — matching positions, turf finished', p:false },
+        { t:'All equipment emptied and cleaned', p:false },
+        { t:'Waste bags + debris removed from property', p:false },
+        { t:'Annual Health Report completed', p:true },
+        { t:'All photos, ATP results, Health Report uploaded', p:false }
+      ]
+    }
+  }
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ STATE ━━
+let currentTier = null, currentPhase = 0, formData = {}, checkStates = {};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ STORAGE ━━
+function loadJobs() {
+  try { return JSON.parse(localStorage.getItem('pg_jobs') || '[]'); } catch(e) { return []; }
+}
+function saveJob(job) {
+  const jobs = loadJobs();
+  jobs.unshift(job);
+  localStorage.setItem('pg_jobs', JSON.stringify(jobs.slice(0, 200)));
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ SCREENS ━━
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goHome() { currentTier=null; currentPhase=0; formData={}; checkStates={}; renderHomeHistory(); show('s-home'); }
+function showHistory() { renderHistoryList(); show('s-history'); }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ HOME HISTORY ━━
+function renderHomeHistory() {
+  const jobs = loadJobs().slice(0,3);
+  const el = document.getElementById('home-history');
+  if (!jobs.length) { el.innerHTML = '<div class="empty-state"><p>No jobs yet.<br>Start your first job above.</p></div>'; return; }
+  el.innerHTML = jobs.map((j,i) => `
+    <div class="history-row" onclick="showDetail(${i}, true)">
+      <div class="history-dot ${j.tier}"></div>
+      <div class="history-info">
+        <div class="history-customer">${j.customer_name || 'No name'}</div>
+        <div class="history-meta">${j.date} · ${TIERS[j.tier].name} · <span class="history-score">${j.checked}/${j.total}</span></div>
+      </div>
+      <div style="color:var(--ink3);font-size:18px;">›</div>
+    </div>`).join('') + (loadJobs().length > 3 ? `<div class="view-all-btn" onclick="showHistory()">View all ${loadJobs().length} jobs ›</div>` : '');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ HISTORY LIST ━━
+function renderHistoryList() {
+  const jobs = loadJobs();
+  const el = document.getElementById('history-list');
+  if (!jobs.length) { el.innerHTML = '<div class="empty-state"><p>No completed jobs saved yet.</p></div>'; return; }
+  el.innerHTML = jobs.map((j,i) => `
+    <div class="history-full-item" onclick="showDetail(${i}, false)">
+      <div class="history-item-top">
+        <div class="history-item-customer">${j.customer_name || 'No name recorded'}</div>
+        <div class="history-item-tier tier-pill-${j.tier}">${TIERS[j.tier].name}</div>
+      </div>
+      <div class="history-item-meta">
+        <span>📅 ${j.date}</span>
+        <span>📋 Job ID: ${j.job_id || '—'}</span>
+        <span>✅ ${j.checked}/${j.total} items</span>
+        ${j.sqft ? `<span>📐 ${j.sqft} sq ft</span>` : ''}
+      </div>
+      ${j.notes ? `<div class="history-item-notes">${j.notes.substring(0,120)}${j.notes.length>120?'…':''}</div>` : ''}
+    </div>`).join('');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ DETAIL ━━
+function showDetail(index, fromHome) {
+  const jobs = loadJobs();
+  const j = jobs[index];
+  if (!j) return;
+  const t = TIERS[j.tier];
+  document.getElementById('detail-back-btn').onclick = fromHome ? goHome : showHistory;
+  document.getElementById('detail-eyebrow').innerHTML = t.eyebrow;
+  document.getElementById('detail-title').innerHTML = t.title;
+
+  const fieldLabels = { customer_name:'Customer', job_id:'Job ID', sqft:'Square footage', notes:'Field notes', infill_notes:'Infill notes', health_notes:'Health report', photo_positions:'Photo positions' };
+  const atpLabels = { atp_baseline_z1:'ATP Zone 1 Baseline', atp_baseline_z2:'ATP Zone 2 Baseline', atp_final_z1:'ATP Zone 1 Final', atp_final_z2:'ATP Zone 2 Final' };
+
+  let html = '';
+
+  // Job info
+  html += '<div class="detail-section-label">Job Info</div><div style="background:var(--paper);border:1.5px solid var(--rule);border-radius:var(--radius);padding:12px 14px;">';
+  html += `<div class="detail-field-row"><span class="detail-key">Date</span><span class="detail-val">${j.date}</span></div>`;
+  html += `<div class="detail-field-row"><span class="detail-key">Tier</span><span class="detail-val">${t.name}</span></div>`;
+  const mainFields = ['customer_name','job_id','sqft'];
+  mainFields.forEach(k => { if (j[k]) html += `<div class="detail-field-row"><span class="detail-key">${fieldLabels[k]||k}</span><span class="detail-val">${j[k]}</span></div>`; });
+  html += '</div>';
+
+  // ATP if renewed
+  const atpKeys = Object.keys(atpLabels).filter(k => j[k]);
+  if (atpKeys.length) {
+    html += '<div class="detail-section-label">ATP Results</div><div style="background:var(--light);border-radius:var(--radius);padding:12px 14px;">';
+    atpKeys.forEach(k => { html += `<div class="detail-field-row"><span class="detail-key">${atpLabels[k]}</span><span class="detail-val">${j[k]}</span></div>`; });
+    html += '</div>';
+  }
+
+  // Notes
+  const noteFields = ['photo_positions','infill_notes','health_notes','notes'];
+  noteFields.forEach(k => {
+    if (j[k]) html += `<div class="detail-section-label">${fieldLabels[k]||k}</div><div style="background:var(--paper);border:1.5px solid var(--rule);border-radius:var(--radius);padding:12px 14px;font-size:13px;color:var(--near-black);line-height:1.6;">${j[k].replace(/\n/g,'<br>')}</div>`;
+  });
+
+  // Checklist
+  html += '<div class="detail-section-label">Checklist — ' + j.checked + '/' + j.total + ' completed</div>';
+  Object.entries(j.checklist).forEach(([group, items]) => {
+    html += `<div style="margin-bottom:8px;border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--rule);">`;
+    html += `<div style="background:var(--green);color:var(--gold-soft);font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:7px 14px;">${group}</div>`;
+    items.forEach(item => {
+      html += `<div class="detail-cl-item" style="padding:10px 14px;">
+        <div class="detail-check ${item.checked?'yes':'no'}">${item.checked?'✓':'–'}</div>
+        <span style="font-size:13px;color:${item.checked?'var(--near-black)':'var(--ink3)'};line-height:1.4;${item.checked?'':'text-decoration:line-through;'}">${item.t}</span>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  html += '<div style="height:20px;"></div>';
+
+  document.getElementById('detail-content').innerHTML = html;
+  show('s-detail');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ JOB FLOW ━━
+function startJob(tier) {
+  currentTier = tier; currentPhase = 0; formData = {}; checkStates = {};
+  const t = TIERS[tier];
+  // init checklist states
+  Object.entries(t.checklist).forEach(([g, items]) => items.forEach((item,i) => { checkStates[g+'_'+i] = false; }));
+  document.getElementById('job-eyebrow').innerHTML = t.eyebrow;
+  document.getElementById('job-display-title').innerHTML = t.title;
+  renderPhase();
+  show('s-job');
+}
+
+function confirmBack() {
+  if (confirm('Leave this job? Progress will be lost.')) goHome();
+}
+
+function renderPhase() {
+  const t = TIERS[currentTier];
+  const totalPhases = t.phases.length + 1; // +1 for checklist
+  const pct = Math.round((currentPhase / totalPhases) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  const isChecklist = currentPhase === t.phases.length;
+  const phaseLabel = isChecklist ? 'Checklist' : t.phases[currentPhase].label;
+  document.getElementById('job-phase-label').textContent = phaseLabel;
+  document.getElementById('progress-lbl').textContent = 'Step ' + (currentPhase+1) + ' of ' + totalPhases + ' — ' + phaseLabel;
+  document.getElementById('btn-prev').style.display = currentPhase === 0 ? 'none' : 'flex';
+  const nextBtn = document.getElementById('btn-next');
+  nextBtn.innerHTML = isChecklist ? '✓ Complete Job' : 'Next ›';
+  if (isChecklist) { renderChecklist(); } else { renderPhaseContent(t.phases[currentPhase]); }
+  document.getElementById('job-scroll').scrollTop = 0;
+}
+
+function renderPhaseContent(phase) {
+  let html = '<div class="phase-content"><div class="phase-badge">' + phase.label + '</div>';
+  phase.steps.forEach(s => {
+    if (s.field) { html += renderField(s); return; }
+    const cls = s.premium ? ' gold-left' : '';
+    html += `<div class="step-card${cls}"><div class="step-inner"><span class="step-num">${s.n}</span><div class="step-body"><div class="step-text">${s.t}${s.premium?'<span class="gold-badge">Renewed</span>':''}</div>`;
+    if (s.mixes) html += '<div class="mix-pills">' + s.mixes.map(m=>`<span class="mix-pill">${m}</span>`).join('') + '</div>';
+    if (s.warn) html += `<div class="warn-box">${s.warn}</div>`;
+    if (s.dwell) html += `<div class="dwell-box">${s.dwell}</div>`;
+    html += '</div></div></div>';
+  });
+  if (phase.fields) phase.fields.forEach(f => { html += renderField(f); });
+  html += '</div>';
+  document.getElementById('job-content').innerHTML = html;
+  attachListeners();
+}
+
+function renderField(f) {
+  if (f.type === 'atp') {
+    const p = f.prefix;
+    const isBaseline = p === 'baseline';
+    const label = isBaseline ? 'Baseline (before)' : 'Final (after)';
+    return `<div style="margin-bottom:12px;">
+      <div class="field-lbl">${f.label}</div>
+      <div class="atp-grid">
+        <div class="atp-cell"><span class="atp-cell-lbl">Zone 1 — ${label}</span><input class="field-input" data-field="atp_${p}_z1" value="${formData['atp_'+p+'_z1']||''}" placeholder="RLU reading" style="padding:9px 11px;"></div>
+        <div class="atp-cell"><span class="atp-cell-lbl">Zone 2 — ${label}</span><input class="field-input" data-field="atp_${p}_z2" value="${formData['atp_'+p+'_z2']||''}" placeholder="RLU reading" style="padding:9px 11px;"></div>
+      </div></div>`;
+  }
+  const val = (formData[f.field]||'').replace(/"/g,'&quot;');
+  if (f.type === 'textarea') return `<div class="field-block"><span class="field-lbl">${f.label}</span><textarea class="field-input" data-field="${f.field}" rows="${f.rows||3}" placeholder="">${formData[f.field]||''}</textarea></div>`;
+  return `<div class="field-block"><span class="field-lbl">${f.label}</span><input type="text" class="field-input" data-field="${f.field}" value="${val}" placeholder=""></div>`;
+}
+
+function attachListeners() {
+  document.querySelectorAll('[data-field]').forEach(el => {
+    el.addEventListener('input', e => { formData[e.target.dataset.field] = e.target.value; });
+    el.addEventListener('change', e => { formData[e.target.dataset.field] = e.target.value; });
+  });
+}
+
+function renderChecklist() {
+  const t = TIERS[currentTier];
+  let total = 0, checked = 0;
+  Object.entries(t.checklist).forEach(([g,items]) => items.forEach((_,i) => { total++; if(checkStates[g+'_'+i]) checked++; }));
+  let html = `<div class="cl-section"><div class="cl-title">Field Checklist</div><div class="cl-subtitle">Tap each item to check off. Work through in order.</div><div class="cl-score" id="cl-score">${checked} / ${total} completed</div>`;
+  Object.entries(t.checklist).forEach(([group, items]) => {
+    html += `<div class="cl-group"><div class="cl-group-lbl">${group}</div>`;
+    items.forEach((item,i) => {
+      const key = group+'_'+i, isChecked = checkStates[key];
+      html += `<div class="cl-item${item.p?' premium':''}" onclick="toggleCheck('${group}',${i})">
+        <div class="cl-box${isChecked?' checked':'}" id="cb_${group}_${i}"><div class="cl-checkmark"></div></div>
+        <span class="cl-text${isChecked?' done':''}" id="ct_${group}_${i}">${item.t}${item.p?'<span class="gold-badge">Renewed</span>':''}</span>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('job-content').innerHTML = html;
+}
+
+function toggleCheck(group, i) {
+  const key = group+'_'+i;
+  checkStates[key] = !checkStates[key];
+  const checked = checkStates[key];
+  const box = document.getElementById('cb_'+group+'_'+i);
+  const txt = document.getElementById('ct_'+group+'_'+i);
+  if (box) box.className = 'cl-box' + (checked?' checked':'');
+  if (txt) txt.className = 'cl-text' + (checked?' done':'');
+  // update score
+  const t = TIERS[currentTier];
+  let total=0, chk=0;
+  Object.entries(t.checklist).forEach(([g,items]) => items.forEach((_,idx)=>{ total++; if(checkStates[g+'_'+idx]) chk++; }));
+  const sc = document.getElementById('cl-score');
+  if (sc) sc.textContent = chk+' / '+total+' completed';
+}
+
+function nextPhase() {
+  const t = TIERS[currentTier];
+  if (currentPhase >= t.phases.length) { completeJob(); return; }
+  currentPhase++;
+  renderPhase();
+}
+function prevPhase() { if (currentPhase > 0) { currentPhase--; renderPhase(); } }
+
+function completeJob() {
+  const t = TIERS[currentTier];
+  let total=0, checked=0;
+  const clSnapshot = {};
+  Object.entries(t.checklist).forEach(([g,items]) => {
+    clSnapshot[g] = items.map((item,i) => ({ t:item.t, p:item.p, checked:!!checkStates[g+'_'+i] }));
+    items.forEach((_,i) => { total++; if(checkStates[g+'_'+i]) checked++; });
+  });
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+
+  const job = {
+    tier: currentTier,
+    date: dateStr,
+    customer_name: formData.customer_name || '',
+    job_id: formData.job_id || '',
+    sqft: formData.sqft || '',
+    photo_positions: formData.photo_positions || '',
+    notes: formData.notes || '',
+    infill_notes: formData.infill_notes || '',
+    health_notes: formData.health_notes || '',
+    atp_baseline_z1: formData.atp_baseline_z1 || '',
+    atp_baseline_z2: formData.atp_baseline_z2 || '',
+    atp_final_z1: formData.atp_final_z1 || '',
+    atp_final_z2: formData.atp_final_z2 || '',
+    checked, total,
+    checklist: clSnapshot
+  };
+  saveJob(job);
+
+  // Summary
+  const tierNames = {fresh:'Fresh Grove',revived:'Revived Grove',renewed:'Renewed Grove'};
+  const rows = [
+    ['Tier', tierNames[currentTier]],
+    ['Customer', formData.customer_name || '—'],
+    ['Job ID', formData.job_id || '—'],
+    ['Date', dateStr],
+    ['Checklist', checked+' / '+total+' items completed']
+  ];
+  if (formData.atp_baseline_z1) rows.push(['ATP Zone 1', (formData.atp_baseline_z1||'—')+' → '+(formData.atp_final_z1||'—')]);
+  if (formData.atp_baseline_z2) rows.push(['ATP Zone 2', (formData.atp_baseline_z2||'—')+' → '+(formData.atp_final_z2||'—')]);
+
+  document.getElementById('complete-summary').innerHTML = rows.map(([k,v]) =>
+    `<div class="summary-row"><span class="summary-key">${k}</span><span class="summary-val">${v}</span></div>`
+  ).join('');
+  show('s-complete');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ INIT ━━
+renderHomeHistory();
+</script>
+</body>
+</html>
