@@ -7,9 +7,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PureGrove">
 <title>PureGrove Field App</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Poppins:wght@300;400;500;600&display=swap');
+</style>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -21,12 +21,15 @@
   --radius: 12px; --radius-sm: 8px;
 }
 
-html, body { height: 100%; overflow: hidden; background: var(--cream); }
-
+html { height: 100%; height: -webkit-fill-available; background: var(--cream); }
 body {
+  height: 100%; height: -webkit-fill-available;
+  overflow: hidden;
   font-family: 'Poppins', -apple-system, sans-serif;
   color: var(--near-black);
   -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
+  cursor: pointer;
 }
 
 /* ── Layout ── */
@@ -51,17 +54,17 @@ body {
 .eyebrow::before { content: ""; width: 16px; height: 1px; background: var(--gold); flex-shrink: 0; }
 
 /* ── Buttons ── */
-.btn-primary { flex: 1; background: var(--green); color: var(--cream); border: none; border-radius: var(--radius); padding: 15px; font-size: 14px; font-weight: 600; letter-spacing: 0.4px; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-primary { flex: 1; background: var(--green); color: var(--cream); border: none; border-radius: var(--radius); padding: 15px; font-size: 14px; font-weight: 600; letter-spacing: 0.4px; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; touch-action: manipulation; -webkit-appearance: none; }
 .btn-primary:active { background: var(--forest); }
-.btn-secondary { background: transparent; color: var(--ink2); border: 1.5px solid var(--rule); border-radius: var(--radius); padding: 15px 18px; font-size: 14px; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-secondary { background: transparent; color: var(--ink2); border: 1.5px solid var(--rule); border-radius: var(--radius); padding: 15px 18px; font-size: 14px; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px; touch-action: manipulation; -webkit-appearance: none; }
 .btn-secondary:active { background: var(--paper); }
-.btn-ghost { background: none; border: none; cursor: pointer; font-family: inherit; }
+.btn-ghost { background: none; border: none; cursor: pointer; font-family: inherit; touch-action: manipulation; -webkit-appearance: none; }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ HOME ━━ */
 .home-body { padding: 20px 16px 16px; }
 .home-section-label { font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--ink3); margin-bottom: 10px; }
 
-.tier-card { background: var(--cream); border: 1.5px solid var(--rule); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 14px; }
+.tier-card { background: var(--cream); border: 1.5px solid var(--rule); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 14px; touch-action: manipulation; }
 .tier-card:active { background: var(--paper); }
 .tier-card-text { flex: 1; }
 .tier-eyebrow { font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 3px; }
@@ -136,7 +139,7 @@ body {
 
 .cl-group { margin-bottom: 8px; border-radius: var(--radius); overflow: hidden; border: 1.5px solid var(--rule); }
 .cl-group-lbl { background: var(--green); color: var(--gold-soft); font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 7px 14px; }
-.cl-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; background: var(--cream); border-top: 1px solid var(--rule); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.cl-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; background: var(--cream); border-top: 1px solid var(--rule); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .cl-item:active { background: var(--paper); }
 .cl-item.premium { border-left: 3px solid var(--gold); }
 .cl-box { width: 24px; height: 24px; border: 1.5px solid rgba(28,58,19,0.3); border-radius: 5px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; background: var(--cream); margin-top: 1px; }
@@ -821,6 +824,9 @@ function completeJob() {
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ INIT ━━
 renderHomeHistory();
+
+// iOS Safari touch fix — ensures onclick fires on all tappable elements
+document.addEventListener('touchstart', function(){}, {passive: true});
 </script>
 </body>
 </html>
