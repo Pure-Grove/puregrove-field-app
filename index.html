@@ -466,7 +466,8 @@ var T = {
         {n:'9.1', t:'<b>Take after photos from the exact same positions</b> noted in pre-job. Turf must be in finished condition.'},
         {n:'9.2', t:'<b>Empty and clean all equipment</b> (vacuum canister, pump sprayer, pooper scooper) before loading out.'},
         {n:'9.3', t:'<b>Remove all waste bags and debris from the property.</b>'},
-        {n:'9.4', t:'<b>Upload all before/after photos</b> to the job record.'}
+        {n:'9.4', t:'<b>Close and lock the gate.</b> Take a photo of the locked gate before leaving the property.', warn:'Do not leave without confirming the gate is fully closed and locked. Gate photo required.'},
+        {n:'9.5', t:'<b>Upload all before/after photos and the gate photo</b> to the job record.'}
       ], fields:[
         {field:'customer_name', label:'Customer name', type:'text'},
         {field:'job_id', label:'Job ID', type:'text'},
@@ -493,7 +494,8 @@ var T = {
         {t:'After photos taken — matching positions, turf finished',p:false},
         {t:'All equipment emptied and cleaned',p:false},
         {t:'Waste bags + debris removed from property',p:false},
-        {t:'Photos uploaded to job record',p:false}
+        {t:'Gate closed and locked — photo taken',p:false},
+        {t:'All photos including gate photo uploaded to job record',p:false}
       ]
     }
   },
@@ -519,6 +521,8 @@ var T = {
         {n:'7.1', t:'<b>Apply OxyTurf</b> evenly across the full surface. <b>Saturate fully — do not flood.</b>'},
         {n:'7.2', t:'<b>Allow 10–15 minutes dwell time.</b> Set a timer. Do not proceed early.', dwell:'⏱ 10–15 min dwell required — set a timer now.'},
         {n:'7.3', t:'After dwell: <b>light agitation with a blow or brush pass</b> to work enzyme into the infill.'},
+        {n:'7.4', t:'<b>Pressure washer rinse — full surface.</b> Consistent overlapping passes. Do not concentrate the stream in one spot.'},
+        {n:'7.5', t:'Allow surface to <b>drain and reach near-dry condition</b> before applying the sanitizer.'},
         {n:'8.1', t:'<b>Apply OxiTabs or Vital Oxide</b> evenly across the full surface in consistent rows.'},
         {n:'8.2', t:'Allow to <b>air dry naturally.</b> Do not rinse.'},
         {n:'9.1', t:'<b>Inspect infill levels</b> across full surface. Add fresh infill to low or depleted areas. Note significant depletion in field notes.'},
@@ -528,7 +532,8 @@ var T = {
         {n:'11.1', t:'<b>Take after photos from the exact same positions</b> noted in pre-job.'},
         {n:'11.2', t:'<b>Empty and clean all equipment</b> (vacuum, sprayers, pooper scooper) before loading out.'},
         {n:'11.3', t:'<b>Remove all waste bags and debris from the property.</b>'},
-        {n:'11.4', t:'<b>Upload all before/after photos</b> to the job record.'}
+        {n:'11.4', t:'<b>Close and lock the gate.</b> Take a photo of the locked gate before leaving the property.', warn:'Do not leave without confirming the gate is fully closed and locked. Gate photo required.'},
+        {n:'11.5', t:'<b>Upload all before/after photos and the gate photo</b> to the job record.'}
       ], fields:[
         {field:'customer_name', label:'Customer name', type:'text'},
         {field:'job_id', label:'Job ID', type:'text'},
@@ -552,6 +557,8 @@ var T = {
         {t:'Perimeter weeds removed (add-on confirmed if applicable)',p:false},
         {t:'OxyTurf applied — full saturation, 10–15 min dwell observed',p:false},
         {t:'Light agitation performed after dwell',p:false},
+        {t:'Pressure washer rinse complete — full surface, consistent passes',p:false},
+        {t:'Surface drained before sanitizer applied',p:false},
         {t:'OxiTabs or Vital Oxide applied — air dry, no rinse',p:false},
         {t:'Infill inspected — fresh infill added where needed',p:false},
         {t:'Final groom complete',p:false}
@@ -560,7 +567,8 @@ var T = {
         {t:'After photos taken — matching positions, turf finished',p:false},
         {t:'All equipment emptied and cleaned',p:false},
         {t:'Waste bags + debris removed from property',p:false},
-        {t:'Photos uploaded to job record',p:false}
+        {t:'Gate closed and locked — photo taken',p:false},
+        {t:'All photos including gate photo uploaded to job record',p:false}
       ]
     }
   },
@@ -603,8 +611,9 @@ var T = {
         {n:'14.2', t:'<b>Take after photos from the exact same positions</b> noted in pre-job.'},
         {n:'14.3', t:'<b>Empty and clean all equipment</b> (vacuum, sprayers, pressure washer, pooper scooper) before loading out.'},
         {n:'14.4', t:'<b>Remove all waste bags and debris from the property.</b>'},
-        {n:'14.5', t:'<b>Complete the Annual Health Report</b> — infill condition, fiber condition, drainage, ATP results, all products applied.', premium:true},
-        {n:'14.6', t:'<b>Upload all photos, ATP results, and Health Report</b> to the job record.'}
+        {n:'14.5', t:'<b>Close and lock the gate.</b> Take a photo of the locked gate before leaving the property.', warn:'Do not leave without confirming the gate is fully closed and locked. Gate photo required.'},
+        {n:'14.6', t:'<b>Complete the Annual Health Report</b> — infill condition, fiber condition, drainage, ATP results, all products applied.', premium:true},
+        {n:'14.7', t:'<b>Upload all photos (including gate photo), ATP results, and Health Report</b> to the job record.'}
       ], fields:[
         {field:'customer_name', label:'Customer name', type:'text'},
         {field:'job_id', label:'Job ID', type:'text'},
@@ -640,8 +649,9 @@ var T = {
         {t:'After photos taken — matching positions, turf finished',p:false},
         {t:'All equipment emptied and cleaned',p:false},
         {t:'Waste bags + debris removed from property',p:false},
+        {t:'Gate closed and locked — photo taken',p:false},
         {t:'Annual Health Report completed',p:true},
-        {t:'All photos, ATP results, Health Report uploaded',p:false}
+        {t:'All photos (including gate), ATP results, Health Report uploaded',p:false}
       ]
     }
   }
